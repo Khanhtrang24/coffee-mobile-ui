@@ -19,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cafetrio.R
-import com.example.cafetrio.ui.theme.CafeBeige
-import com.example.cafetrio.ui.theme.CafeBrown
+import com.example.cafetrio.ui.theme.HighlandRed
+import com.example.cafetrio.ui.theme.HighlandWhite
 import com.example.cafetrio.ui.theme.CafeTrioTheme
 import kotlinx.coroutines.delay
 
@@ -77,7 +77,7 @@ fun SplashScreen(onSplashFinished: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(CafeBeige)
+            .background(HighlandRed)
             .alpha(contentAlpha),
         contentAlignment = Alignment.Center
     ) {
@@ -88,9 +88,9 @@ fun SplashScreen(onSplashFinished: () -> Unit = {}) {
         ) {
             // Logo text với hiệu ứng mờ dần
             Text(
-                text = "Café Trio",
-                color = CafeBrown,
-                fontSize = 48.sp,
+                text = "Brew Co",
+                color = HighlandWhite,
+                fontSize = 56.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.agbalumo_regular)),
                 textAlign = TextAlign.Center,
@@ -99,12 +99,12 @@ fun SplashScreen(onSplashFinished: () -> Unit = {}) {
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Tagline với hiệu ứng mờ dần xuất hiện sau
+            // Tagline với hiệu ứng mờ dần
             Text(
-                text = "\"A Trio of Taste, A Symphony of Aroma\"",
-                color = CafeBrown,
+                text = "Khơi nguồn đam mê cà phê",
+                color = HighlandWhite,
                 fontSize = 16.sp,
-                fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.Normal,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.alpha(taglineAlpha)
             )
@@ -118,4 +118,4 @@ fun SplashScreenPreview() {
     CafeTrioTheme {
         SplashScreen()
     }
-} 
+}

@@ -24,6 +24,7 @@ import com.example.cafetrio.ui.theme.CafeBrown
 import com.example.cafetrio.ui.theme.CafeButtonBackground
 import com.example.cafetrio.ui.theme.CafeLoginBackground
 import com.example.cafetrio.ui.theme.CafeTrioTheme
+import com.example.cafetrio.ui.theme.HighlandRed
 import com.example.cafetrio.ui.theme.HighlandText
 import kotlinx.coroutines.delay
 import retrofit2.Call
@@ -58,57 +59,64 @@ fun OTP_FGPassScreen(
     val seconds = timeRemaining % 60
     val timeString = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
     
-    // Hàm xử lý khi nhấn xác nhận OTP
+    // Hàm xử lý khi nhấn xác nhận OTP - COMMENT API và auto pass
     val handleVerifyOtp = {
-        if (otpValue.length == 6) {
-            isLoading = true
-            
-            ApiClient.apiService.verifyOtp(otpValue).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    isLoading = false
-                    if (response.isSuccessful) {
-                        Toast.makeText(context, "Xác thực OTP thành công!", Toast.LENGTH_SHORT).show()
-                        onVerifyOtp(otpValue)
-                    } else {
-                        Toast.makeText(context, "Xác thực OTP thành công!", Toast.LENGTH_SHORT).show()
-                        onVerifyOtp(otpValue)
-                        //Toast.makeText(context, "Mã OTP không đúng hoặc đã hết hạn", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    isLoading = false
-                    Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
-        } else {
-            Toast.makeText(context, "Vui lòng nhập đủ 6 số OTP", Toast.LENGTH_SHORT).show()
-        }
+        // if (otpValue.length == 6) {
+        //     isLoading = true
+        //
+        //     ApiClient.apiService.verifyOtp(otpValue).enqueue(object : Callback<Void> {
+        //         override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        //             isLoading = false
+        //             if (response.isSuccessful) {
+        //                 Toast.makeText(context, "Xác thực OTP thành công!", Toast.LENGTH_SHORT).show()
+        //                 onVerifyOtp(otpValue)
+        //             } else {
+        //                 Toast.makeText(context, "Mã OTP không đúng hoặc đã hết hạn", Toast.LENGTH_SHORT).show()
+        //             }
+        //         }
+        //
+        //         override fun onFailure(call: Call<Void>, t: Throwable) {
+        //             isLoading = false
+        //             Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
+        //         }
+        //     })
+        // } else {
+        //     Toast.makeText(context, "Vui lòng nhập đủ 6 số OTP", Toast.LENGTH_SHORT).show()
+        // }
+
+        // Auto pass OTP verification
+        Toast.makeText(context, "Xác thực OTP thành công!", Toast.LENGTH_SHORT).show()
+        onVerifyOtp(otpValue.ifEmpty { "123456" })
     }
     
-    // Hàm gửi lại OTP
+    // Hàm gửi lại OTP - COMMENT API
     val handleResendOtp = {
         if (isResendEnabled || timeRemaining <= 0) {
-            isLoading = true
-            val request = ResendOtpRequest(email = emailAddress)
-            
-            ApiClient.apiService.resendOtp(request).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    isLoading = false
-                    if (response.isSuccessful) {
-                        Toast.makeText(context, "Đã gửi lại mã OTP", Toast.LENGTH_SHORT).show()
-                        timeRemaining = 120 // Reset thời gian đếm ngược
-                        isResendEnabled = false
-                    } else {
-                        Toast.makeText(context, "Không thể gửi lại mã OTP: ${response.code()}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    isLoading = false
-                    Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
+            // isLoading = true
+            // val request = ResendOtpRequest(email = emailAddress)
+            //
+            // ApiClient.apiService.resendOtp(request).enqueue(object : Callback<Void> {
+            //     override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            //         isLoading = false
+            //         if (response.isSuccessful) {
+            //             Toast.makeText(context, "Đã gửi lại mã OTP", Toast.LENGTH_SHORT).show()
+            //             timeRemaining = 120
+            //             isResendEnabled = false
+            //         } else {
+            //             Toast.makeText(context, "Không thể gửi lại mã OTP: ${response.code()}", Toast.LENGTH_SHORT).show()
+            //         }
+            //     }
+            //
+            //     override fun onFailure(call: Call<Void>, t: Throwable) {
+            //         isLoading = false
+            //         Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
+            //     }
+            // })
+
+            // Auto pass resend OTP
+            Toast.makeText(context, "Đã gửi lại mã OTP", Toast.LENGTH_SHORT).show()
+            timeRemaining = 120
+            isResendEnabled = false
         }
     }
     
@@ -149,75 +157,93 @@ fun OTP_FGPassScreen(
             // Tiêu đề xác nhận OTP
             Text(
                 text = "Xác nhận Mã OTP",
-                color = HighlandText,
-                fontSize = 24.sp,
+                color = HighlandRed,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            // Thông báo gmail
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Mô tả
             Text(
-                text = "Mã xác thực gồm 6 số đã được gửi đến địa chỉ gmail $emailAddress",
+                text = "Mã xác thực OTP đã được gửi đến",
                 color = HighlandText,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Hướng dẫn
-            Text(
-                text = "Nhập mã để tiếp tục",
-                color = HighlandText,
-                fontSize = 14.sp,
+                fontSize = 16.sp,
                 textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Email
+            Text(
+                text = emailAddress,
+                color = HighlandRed,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
             
-            // Ô nhập OTP 6 số
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // OTP Input Field
             OtpTextField(
                 otpText = otpValue,
-                onOtpTextChange = { value, isFilled ->
+                onOtpTextChange = { value, otpInputFilled ->
                     otpValue = value
                 }
             )
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Thông báo không nhận được mã
+            // Thời gian còn lại
             Text(
-                text = "Bạn không nhận được mã? Gửi lại ($timeString)",
-                color = HighlandText,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable(enabled = isResendEnabled || timeRemaining <= 0) {
+                text = "Thời gian còn lại: $timeString",
+                color = if (timeRemaining > 0) HighlandText else HighlandRed,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Gửi lại OTP
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Không nhận được mã OTP? ",
+                    color = HighlandText,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "Gửi lại",
+                    color = if (isResendEnabled || timeRemaining <= 0) HighlandRed else Color.Gray,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable(enabled = isResendEnabled || timeRemaining <= 0) {
                         handleResendOtp()
                     }
-            )
-            
-            Spacer(modifier = Modifier.height(40.dp))
-            
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             // Nút xác nhận
             Button(
                 onClick = { handleVerifyOtp() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(4.dp),
+                    .height(50.dp),
+                shape = RoundedCornerShape(25.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = CafeButtonBackground,
-                    contentColor = HighlandText
+                    containerColor = HighlandRed
                 ),
                 enabled = otpValue.length == 6 && !isLoading
             ) {
                 Text(
-                    text = "XÁC NHẬN",
+                    text = "Xác nhận",
+                    color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -232,4 +258,4 @@ fun OTP_FGPassScreenPreview() {
     CafeTrioTheme {
         OTP_FGPassScreen()
     }
-} 
+}
