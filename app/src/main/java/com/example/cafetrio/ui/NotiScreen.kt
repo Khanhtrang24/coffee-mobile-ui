@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cafetrio.R
 import com.example.cafetrio.ui.theme.CafeBrown
+import com.example.cafetrio.ui.theme.HighlandRed
+import com.example.cafetrio.ui.theme.HighlandWhite
+import com.example.cafetrio.ui.theme.HighlandText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +61,7 @@ fun NotiScreen(
     var notificationsList by remember { mutableStateOf(notifications) }
 
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = HighlandWhite,
         topBar = {
             TopAppBar(
                 title = {
@@ -66,7 +69,7 @@ fun NotiScreen(
                         text = "Thông báo",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = CafeBrown
+                        color = HighlandWhite
                     )
                 },
                 navigationIcon = {
@@ -74,7 +77,7 @@ fun NotiScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Quay lại",
-                            tint = CafeBrown
+                            tint = HighlandWhite
                         )
                     }
                 },
@@ -93,7 +96,7 @@ fun NotiScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor
+                    containerColor = HighlandRed
                 )
             )
         }
@@ -102,11 +105,17 @@ fun NotiScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .background(HighlandWhite)
         ) {
             items(notificationsList) { notification ->
-                NotificationCard(notification = notification)
+                NotificationCard(
+                    notification = notification,
+                    onMarkAsRead = {
+                        notificationsList = notificationsList.map {
+                            if (it == notification) it.copy(isRead = true) else it
+                        }
+                    }
+                )
             }
         }
     }
@@ -114,59 +123,75 @@ fun NotiScreen(
 
 @Composable
 fun NotificationCard(
-    notification: NotificationItem
+    notification: NotificationItem,
+    onMarkAsRead: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Handle notification click */ },
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onMarkAsRead() },
         colors = CardDefaults.cardColors(
-            containerColor = if (notification.isRead) Color(0xFFF8F1DF) else Color.White
+            containerColor = if (notification.isRead) Color.White else Color(0xFFFFE8E8)
         ),
-        shape = RoundedCornerShape(8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(16.dp),
+            verticalAlignment = Alignment.Top
         ) {
-            // Notification icon
-            Image(
-                painter = painterResource(id = R.drawable.noti_welcome),
-                contentDescription = "Notification icon",
+            // Icon
+            Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-
-            // Notification content
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(HighlandRed.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = notification.title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = CafeBrown
-                )
-                
-                Text(
-                    text = notification.message,
-                    fontSize = 14.sp,
-                    color = Color.Gray
+                Image(
+                    painter = painterResource(id = R.drawable.ic_noti),
+                    contentDescription = "Notification Icon",
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
-            // Timestamp
-            Text(
-                text = notification.timestamp,
-                fontSize = 12.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(start = 8.dp)
-            )
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Content
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = notification.title,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = com.example.cafetrio.ui.theme.HighlandText
+                    )
+
+                    Text(
+                        text = notification.timestamp,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = notification.message,
+                    fontSize = 14.sp,
+                    color = com.example.cafetrio.ui.theme.HighlandText.copy(alpha = 0.8f),
+                    lineHeight = 20.sp
+                )
+            }
         }
     }
 }
@@ -175,5 +200,5 @@ data class NotificationItem(
     val title: String,
     val message: String,
     val timestamp: String,
-    val isRead: Boolean
-) 
+    val isRead: Boolean = false
+)

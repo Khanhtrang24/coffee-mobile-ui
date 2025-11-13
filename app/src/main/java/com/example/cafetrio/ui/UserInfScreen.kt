@@ -1,25 +1,23 @@
 package com.example.cafetrio.ui
 
 import android.app.DatePickerDialog
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,8 +27,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cafetrio.R
-import com.example.cafetrio.ui.theme.CafeBeige
-import com.example.cafetrio.ui.theme.CafeBrown
+import com.example.cafetrio.ui.theme.HighlandRed
+import com.example.cafetrio.ui.theme.HighlandWhite
+import com.example.cafetrio.ui.theme.HighlandText
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -82,7 +81,7 @@ fun UserInfScreen(
                 title = {
                     Text(
                         "Cập nhật thông tin",
-                        color = CafeBrown,
+                        color = com.example.cafetrio.ui.theme.HighlandWhite,
                         fontWeight = FontWeight.Medium
                     )
                 },
@@ -91,272 +90,337 @@ fun UserInfScreen(
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = CafeBrown
+                            tint = com.example.cafetrio.ui.theme.HighlandWhite
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CafeBeige
+                    containerColor = com.example.cafetrio.ui.theme.HighlandRed
                 )
             )
         },
-        containerColor = CafeBeige
+        containerColor = com.example.cafetrio.ui.theme.HighlandWhite
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
-                .background(CafeBeige),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(com.example.cafetrio.ui.theme.HighlandWhite)
+                .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Avatar
-            Box(
+            // Profile Header Section
+            Column(
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .background(HighlandRed)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.coffee_beans), // Change to an existing icon in your drawable
-                    contentDescription = "Avatar Placeholder",
-                    modifier = Modifier.size(50.dp)
+                // Avatar with edit badge
+                Box(
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.coffee_beans),
+                            contentDescription = "Avatar",
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+
+                    // Edit icon badge
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(HighlandWhite, CircleShape)
+                            .padding(6.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_delete),
+                            contentDescription = "Edit",
+                            tint = HighlandRed,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = name.ifEmpty { "Người dùng" },
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HighlandWhite
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Name Field
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Tên của bạn") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = CafeBrown,
-                    unfocusedBorderColor = Color.LightGray,
-                    cursorColor = CafeBrown,
-                    focusedLabelColor = CafeBrown,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedTextColor = CafeBrown,
-                    unfocusedTextColor = Color.DarkGray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Email Field
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email của bạn") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = CafeBrown,
-                    unfocusedBorderColor = Color.LightGray,
-                    cursorColor = CafeBrown,
-                    focusedLabelColor = CafeBrown,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedTextColor = CafeBrown,
-                    unfocusedTextColor = Color.DarkGray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Birth Date Field
-            OutlinedTextField(
-                value = birthDate,
-                onValueChange = { birthDate = it },
-                label = { Text("Chọn ngày sinh") },
+            // Personal Info Section
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { datePickerDialog.show() },
-                readOnly = true,
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(id = android.R.drawable.ic_menu_my_calendar), // Change to an existing calendar icon
-                        contentDescription = "Chọn ngày sinh",
-                        tint = CafeBrown,
-                        modifier = Modifier.clickable { datePickerDialog.show() }
-                    )
-                },
-                shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = CafeBrown,
-                    unfocusedBorderColor = Color.LightGray,
-                    cursorColor = CafeBrown,
-                    focusedLabelColor = CafeBrown,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedTextColor = CafeBrown,
-                    unfocusedTextColor = Color.DarkGray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Gender Field
-            ExposedDropdownMenuBox(
-                expanded = expandedGenderDropdown,
-                onExpandedChange = { expandedGenderDropdown = !expandedGenderDropdown },
-                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                OutlinedTextField(
-                    value = gender,
-                    onValueChange = { },
-                    label = { Text("Chọn giới tính") },
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(),
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = expandedGenderDropdown
-                        )
-                    },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = CafeBrown,
-                        unfocusedBorderColor = Color.LightGray,
-                        cursorColor = CafeBrown,
-                        focusedLabelColor = CafeBrown,
-                        unfocusedLabelColor = Color.Gray,
-                        focusedTextColor = CafeBrown,
-                        unfocusedTextColor = Color.DarkGray,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
-                    )
-                )
-                ExposedDropdownMenu(
-                    expanded = expandedGenderDropdown,
-                    onDismissRequest = { expandedGenderDropdown = false },
-                    modifier = Modifier.background(Color.White)
+                        .padding(16.dp)
                 ) {
-                    genderOptions.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(selectionOption, color = CafeBrown) },
-                            onClick = {
-                                gender = selectionOption
-                                expandedGenderDropdown = false
-                            },
-                            modifier = Modifier.background(Color.White)
+                    Text(
+                        text = "Thông tin cá nhân",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = HighlandRed
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Name Field
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Họ và tên") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = HighlandRed,
+                            unfocusedBorderColor = Color.LightGray,
+                            cursorColor = HighlandRed,
+                            focusedLabelColor = HighlandRed
                         )
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Email Field
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = HighlandRed,
+                            unfocusedBorderColor = Color.LightGray,
+                            cursorColor = HighlandRed,
+                            focusedLabelColor = HighlandRed
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Birth Date and Gender in Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Birth Date
+                        OutlinedTextField(
+                            value = birthDate,
+                            onValueChange = { birthDate = it },
+                            label = { Text("Ngày sinh") },
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { datePickerDialog.show() },
+                            readOnly = true,
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = HighlandRed,
+                                unfocusedBorderColor = Color.LightGray
+                            )
+                        )
+
+                        // Gender
+                        ExposedDropdownMenuBox(
+                            expanded = expandedGenderDropdown,
+                            onExpandedChange = { expandedGenderDropdown = !expandedGenderDropdown },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            OutlinedTextField(
+                                value = gender,
+                                onValueChange = { },
+                                label = { Text("Giới tính") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenderDropdown) },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = HighlandRed,
+                                    unfocusedBorderColor = Color.LightGray
+                                )
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandedGenderDropdown,
+                                onDismissRequest = { expandedGenderDropdown = false }
+                            ) {
+                                genderOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            gender = option
+                                            expandedGenderDropdown = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Current Password Field
-            OutlinedTextField(
-                value = currentPassword,
-                onValueChange = { currentPassword = it },
-                label = { Text("Nhập mật khẩu hiện tại") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (showCurrentPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { showCurrentPassword = !showCurrentPassword }) {
-                        Icon(
-                            painter = painterResource(
-                                id = if (showCurrentPassword) R.drawable.eye
-                                else R.drawable.close_eye
-                            ),
-                            contentDescription = if (showCurrentPassword) "Hide password" else "Show password",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                },
-                shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = CafeBrown,
-                    unfocusedBorderColor = Color.LightGray,
-                    cursorColor = CafeBrown,
-                    focusedLabelColor = CafeBrown,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedTextColor = CafeBrown,
-                    unfocusedTextColor = Color.DarkGray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
-            )
+            // Security Section
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Bảo mật",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = HighlandRed
+                    )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            // New Password Field
-            OutlinedTextField(
-                value = newPassword,
-                onValueChange = { newPassword = it },
-                label = { Text("Nhập mật khẩu mới") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (showNewPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { showNewPassword = !showNewPassword }) {
-                        Icon(
-                            painter = painterResource(
-                                id = if (showNewPassword) R.drawable.eye
-                                else R.drawable.close_eye
-                            ),
-                            contentDescription = if (showNewPassword) "Hide password" else "Show password",
-                            modifier = Modifier.size(24.dp)
+                    // Current Password
+                    OutlinedTextField(
+                        value = currentPassword,
+                        onValueChange = { currentPassword = it },
+                        label = { Text("Mật khẩu hiện tại") },
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = if (showCurrentPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            IconButton(onClick = { showCurrentPassword = !showCurrentPassword }) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (showCurrentPassword) R.drawable.eye else R.drawable.close_eye
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = HighlandRed,
+                            unfocusedBorderColor = Color.LightGray,
+                            cursorColor = HighlandRed,
+                            focusedLabelColor = HighlandRed
                         )
-                    }
-                },
-                shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = CafeBrown,
-                    unfocusedBorderColor = Color.LightGray,
-                    cursorColor = CafeBrown,
-                    focusedLabelColor = CafeBrown,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedTextColor = CafeBrown,
-                    unfocusedTextColor = Color.DarkGray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
-            )
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // New Password
+                    OutlinedTextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        label = { Text("Mật khẩu mới") },
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = if (showNewPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            IconButton(onClick = { showNewPassword = !showNewPassword }) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (showNewPassword) R.drawable.eye else R.drawable.close_eye
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = HighlandRed,
+                            unfocusedBorderColor = Color.LightGray,
+                            cursorColor = HighlandRed,
+                            focusedLabelColor = HighlandRed
+                        )
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Update Info Button
-            Button(
-                onClick = onUpdateInfoClick,
+            // Action Buttons
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = CafeBrown)
+                    .padding(horizontal = 16.dp)
             ) {
-                Text("Cập nhật thông tin", color = Color.White, fontSize = 16.sp)
+                // Update Button
+                Button(
+                    onClick = onUpdateInfoClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = HighlandRed)
+                ) {
+                    Text(
+                        text = "Cập nhật thông tin",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Delete Account
+                OutlinedButton(
+                    onClick = onDeleteAccountClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = HighlandRed
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, HighlandRed)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_delete),
+                        contentDescription = null,
+                        tint = HighlandRed,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Xóa tài khoản",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Delete Account Button
-            TextButton(onClick = onDeleteAccountClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_delete), // Change to an existing delete icon
-                    contentDescription = "Xóa tài khoản",
-                    tint = Color.Red,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Xóa tài khoản", color = Color.Red, fontSize = 14.sp)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
-} 
+}

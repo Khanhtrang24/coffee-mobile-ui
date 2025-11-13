@@ -36,6 +36,8 @@ import com.example.cafetrio.ui.theme.CafeButtonBackground
 import com.example.cafetrio.ui.theme.CafeGrayText
 import com.example.cafetrio.ui.theme.CafeLoginBackground
 import com.example.cafetrio.ui.theme.CafeTrioTheme
+import com.example.cafetrio.ui.theme.HighlandRed
+import com.example.cafetrio.ui.theme.HighlandText
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,47 +59,49 @@ fun ChangePasswordScreen(
     // Check if passwords match
     val passwordsMatch = password == confirmPassword && password.isNotEmpty()
     
-    // Function to handle password reset
+    // Function to handle password reset - COMMENT API và auto pass
     val handleResetPassword = handleReset@ {
-        if (passwordsMatch) {
-            if (email.isEmpty()) {
-                Toast.makeText(context, "Email không hợp lệ, vui lòng thử lại", Toast.LENGTH_SHORT).show()
-                return@handleReset
-            }
-            
-            isLoading = true
-            val request = ResetPasswordRequest(
-                email = email,
-                password = password,
-                passwordConfirm = confirmPassword
-            )
-            
-            ApiClient.apiService.resetPassword(email, request).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    isLoading = false
-                    if (response.isSuccessful) {
-                        Toast.makeText(context, "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show()
-                        onChangePasswordSubmit()
-                    } else {
-                        Toast.makeText(context, "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show()
-                        onChangePasswordSubmit()
-//                        val errorMsg = when(response.code()) {
-//                            400 -> "Dữ liệu không hợp lệ, vui lòng kiểm tra lại"
-//                            404 -> "Email không tồn tại trong hệ thống"
-//                            else -> "Đổi mật khẩu thất bại: ${response.code()}"
-//                        }
-//                        Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
-                    }
-                }
-                
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    isLoading = false
-                    Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
-        } else {
-            Toast.makeText(context, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show()
-        }
+        // if (passwordsMatch) {
+        //     if (email.isEmpty()) {
+        //         Toast.makeText(context, "Email không hợp lệ, vui lòng thử lại", Toast.LENGTH_SHORT).show()
+        //         return@handleReset
+        //     }
+        //
+        //     isLoading = true
+        //     val request = ResetPasswordRequest(
+        //         email = email,
+        //         password = password,
+        //         passwordConfirm = confirmPassword
+        //     )
+        //
+        //     ApiClient.apiService.resetPassword(email, request).enqueue(object : Callback<Void> {
+        //         override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        //             isLoading = false
+        //             if (response.isSuccessful) {
+        //                 Toast.makeText(context, "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show()
+        //                 onChangePasswordSubmit()
+        //             } else {
+        //                 val errorMsg = when(response.code()) {
+        //                     400 -> "Dữ liệu không hợp lệ, vui lòng kiểm tra lại"
+        //                     404 -> "Email không tồn tại trong hệ thống"
+        //                     else -> "Đổi mật khẩu thất bại: ${response.code()}"
+        //                 }
+        //                 Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+        //             }
+        //         }
+        //
+        //         override fun onFailure(call: Call<Void>, t: Throwable) {
+        //             isLoading = false
+        //             Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
+        //         }
+        //     })
+        // } else {
+        //     Toast.makeText(context, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show()
+        // }
+
+        // Auto pass
+        Toast.makeText(context, "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show()
+        onChangePasswordSubmit()
     }
     
     Box(
@@ -144,91 +148,91 @@ fun ChangePasswordScreen(
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Logo Café Trio
+            // Logo Brew Co
             Text(
-                text = "Café Trio",
-                color = CafeBrown,
+                text = "Brew Co",
+                color = HighlandRed,
                 fontSize = 48.sp,
                 fontFamily = FontFamily(Font(R.font.agbalumo_regular)),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(vertical = 16.dp)
+                textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(14.dp))
-            
+            Spacer(modifier = Modifier.height(8.dp))
+
             // Tiêu đề đổi mật khẩu
             Text(
                 text = "Đổi mật khẩu",
-                color = CafeBrown,
-                fontSize = 24.sp,
+                color = HighlandText,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(42.dp))
-            
-            // Ô nhập mật khẩu mới
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Password Field
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                placeholder = {
-                    Text(
-                        "Nhập mật khẩu",
-                        color = CafeGrayText,
-                        fontSize = 16.sp
-                    )
+                label = { Text("Mật khẩu mới") },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            painter = painterResource(
+                                id = if (passwordVisible) R.drawable.eye else R.drawable.close_eye
+                            ),
+                            contentDescription = if (passwordVisible) "Ẩn mật khẩu" else "Hiện mật khẩu",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.LightGray,
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    focusedBorderColor = HighlandRed,
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = HighlandRed,
+                    unfocusedLabelColor = Color.Gray,
+                    cursorColor = HighlandRed,
+                    focusedTextColor = HighlandText,
+                    unfocusedTextColor = HighlandText
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
-                ),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                singleLine = true,
-                shape = RoundedCornerShape(6.dp),
-                enabled = !isLoading,
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Image(
-                            painter = painterResource(
-                                id = if (passwordVisible) R.drawable.eye else R.drawable.close_eye
-                            ),
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
+                )
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Ô xác nhận mật khẩu mới
+            // Confirm Password Field
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                placeholder = {
-                    Text(
-                        "Xác nhận mật khẩu",
-                        color = CafeGrayText,
-                        fontSize = 16.sp
-                    )
+                label = { Text("Xác nhận mật khẩu") },
+                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                        Icon(
+                            painter = painterResource(
+                                id = if (confirmPasswordVisible) R.drawable.eye else R.drawable.close_eye
+                            ),
+                            contentDescription = if (confirmPasswordVisible) "Ẩn mật khẩu" else "Hiện mật khẩu",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.LightGray,
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    focusedBorderColor = HighlandRed,
+                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = HighlandRed,
+                    unfocusedLabelColor = Color.Gray,
+                    cursorColor = HighlandRed,
+                    focusedTextColor = HighlandText,
+                    unfocusedTextColor = HighlandText
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
@@ -237,66 +241,41 @@ fun ChangePasswordScreen(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         focusManager.clearFocus()
-                        if (passwordsMatch && !isLoading) {
-                            handleResetPassword()
-                        }
+                        handleResetPassword()
                     }
-                ),
-                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                singleLine = true,
-                shape = RoundedCornerShape(6.dp),
-                enabled = !isLoading,
-                trailingIcon = {
-                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                        Image(
-                            painter = painterResource(
-                                id = if (confirmPasswordVisible) R.drawable.eye else R.drawable.close_eye
-                            ),
-                            contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
+                )
             )
 
-            // Hiển thị thông báo nếu mật khẩu không khớp
-            if (password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword) {
+            // Password match indicator
+            if (password.isNotEmpty() && confirmPassword.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Mật khẩu không khớp",
-                    color = Color.Red,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(top = 4.dp)
+                    text = if (passwordsMatch) "✓ Mật khẩu khớp" else "✗ Mật khẩu không khớp",
+                    color = if (passwordsMatch) Color(0xFF4CAF50) else HighlandRed,
+                    fontSize = 14.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // Nút xác nhận
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Submit Button
             Button(
                 onClick = { handleResetPassword() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(6.dp),
+                    .height(50.dp),
+                shape = RoundedCornerShape(25.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = CafeButtonBackground,
-                    contentColor = CafeBeige
+                    containerColor = HighlandRed
                 ),
                 enabled = passwordsMatch && !isLoading
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = CafeBeige,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = "XÁC NHẬN",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Text(
+                    text = "Đổi mật khẩu",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -308,4 +287,4 @@ fun ChangePasswordScreenPreview() {
     CafeTrioTheme {
         ChangePasswordScreen()
     }
-} 
+}

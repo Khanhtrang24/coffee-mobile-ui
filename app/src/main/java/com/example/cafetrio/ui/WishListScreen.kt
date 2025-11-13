@@ -16,20 +16,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cafetrio.R
 import com.example.cafetrio.data.WishlistManager
 import com.example.cafetrio.data.models.WishlistItem
+import com.example.cafetrio.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WishListScreen(
     onBackClick: () -> Unit = {}
 ) {
-    val backgroundColor = Color(0xFFF8F4E1)
-    val wishlistManager = WishlistManager.getInstance()
-    val wishlistItems by wishlistManager.wishlistItems.collectAsState()
+    // Comment API call và dùng mock data
+    // val wishlistManager = WishlistManager.getInstance()
+    // val wishlistItems by wishlistManager.wishlistItems.collectAsState()
+
+    // Mock data for preview
+    val wishlistItems = remember {
+        listOf(
+            WishlistItem(
+                id = "1",
+                name = "Cà Phê Sữa Đá",
+                price = "39.000đ",
+                imageRes = R.drawable.cfs_da
+            ),
+            WishlistItem(
+                id = "2",
+                name = "Trà Sữa Oolong",
+                price = "55.000đ",
+                imageRes = R.drawable.tra_sua_oolong_tu_quy_suong_sao
+            )
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -37,9 +57,9 @@ fun WishListScreen(
                 title = {
                     Text(
                         text = "Sản phẩm yêu thích",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF553311)
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = HighlandWhite
                     )
                 },
                 navigationIcon = {
@@ -47,12 +67,12 @@ fun WishListScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color(0xFF553311)
+                            tint = HighlandWhite
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor
+                    containerColor = HighlandRed
                 )
             )
         }
@@ -61,7 +81,7 @@ fun WishListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(backgroundColor)
+                .background(HighlandWhite)
         ) {
             if (wishlistItems.isEmpty()) {
                 // Empty state
@@ -73,7 +93,7 @@ fun WishListScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_fav),
+                        painter = painterResource(id = R.drawable.ic_love),
                         contentDescription = "Empty Wishlist",
                         modifier = Modifier.size(80.dp)
                     )
@@ -83,7 +103,7 @@ fun WishListScreen(
                     Text(
                         text = "Bạn chưa có sản phẩm yêu thích",
                         fontSize = 16.sp,
-                        color = Color(0xFF553311),
+                        color = HighlandText,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -96,6 +116,10 @@ fun WishListScreen(
                 ) {
                     items(wishlistItems) { item ->
                         WishlistItemCard(item = item)
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
@@ -112,7 +136,8 @@ fun WishlistItemCard(item: WishlistItem) {
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
@@ -121,17 +146,22 @@ fun WishlistItemCard(item: WishlistItem) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Product image
-            Image(
-                painter = painterResource(id = item.imageRes),
-                contentDescription = item.name,
+            Box(
                 modifier = Modifier
                     .size(80.dp)
                     .background(
-                        color = Color(0xFFF5F5F5),
+                        color = HighlandRed.copy(alpha = 0.1f),
                         shape = RoundedCornerShape(8.dp)
-                    )
-            )
-            
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.coffee_beans),
+                    contentDescription = item.name,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.width(16.dp))
             
             // Product details
@@ -142,7 +172,7 @@ fun WishlistItemCard(item: WishlistItem) {
                     text = item.name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF553311)
+                    color = HighlandText
                 )
                 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -151,9 +181,26 @@ fun WishlistItemCard(item: WishlistItem) {
                     text = item.price,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF553311)
+                    color = HighlandRed
+                )
+            }
+
+            // Remove button
+            IconButton(onClick = { /* Remove from wishlist */ }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_love),
+                    contentDescription = "Remove",
+                    tint = HighlandRed
                 )
             }
         }
     }
-} 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WishListScreenPreview() {
+    CafeTrioTheme {
+        WishListScreen()
+    }
+}

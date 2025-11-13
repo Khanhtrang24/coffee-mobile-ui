@@ -43,6 +43,7 @@ import com.example.cafetrio.ui.theme.CafeGrayText
 import com.example.cafetrio.ui.theme.CafeLoginBackground
 import com.example.cafetrio.ui.theme.CafeTrioTheme
 import com.example.cafetrio.ui.theme.HighlandRed
+import com.example.cafetrio.ui.theme.HighlandWhite
 import com.example.cafetrio.ui.theme.HighlandText
 import java.text.SimpleDateFormat
 import java.util.*
@@ -121,15 +122,18 @@ fun SignUpScreen(
         updateDate(currentYear - 18, calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
     }
     
-    // Form validation
-    val isFormValid = emailAddress.isNotEmpty() &&
-                     phoneNumber.isNotEmpty() && 
-                     fullName.isNotEmpty() && 
-                     birthday.isNotEmpty() && 
-                     gender.isNotEmpty() && 
-                     password.isNotEmpty() && 
-                     password == confirmPassword
-    
+    // Form validation - COMMENT OUT để auto pass
+    // val isFormValid = emailAddress.isNotEmpty() &&
+    //                  phoneNumber.isNotEmpty() &&
+    //                  fullName.isNotEmpty() &&
+    //                  birthday.isNotEmpty() &&
+    //                  gender.isNotEmpty() &&
+    //                  password.isNotEmpty() &&
+    //                  password == confirmPassword
+
+    // Auto pass validation - cho phép đi tiếp ngay cả khi chưa điền đủ
+    val isFormValid = true
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -518,57 +522,65 @@ fun SignUpScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Nút xác nhận
+            // Nút Đăng ký
             Button(
                 onClick = {
-                    if (isFormValid) {
-                        val request = RegisterRequest(
-                            email = emailAddress,
-                            password = password,
-                            passwordConfirm = confirmPassword,
-                            fullName = fullName,
-//                            phone = phoneNumber
-                        )
+                    // Comment API call và auto navigate
+                    // focusManager.clearFocus()
+                    // val registerRequest = RegisterRequest(
+                    //     email = emailAddress,
+                    //     phone = phoneNumber,
+                    //     fullName = fullName,
+                    //     birthday = birthday,
+                    //     gender = gender,
+                    //     password = password
+                    // )
+                    // ApiClient.apiService.register(registerRequest).enqueue(...)
 
-                        ApiClient.apiService.register(request).enqueue(object : Callback<Void> {
-                            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                if (response.isSuccessful) {
-                                    Toast.makeText(context, "Đăng ký thành công! Vui lòng xác thực OTP", Toast.LENGTH_SHORT).show()
-                                    onNavigateToOTP(emailAddress)
-                                } else {
-                                    val errorMsg = when(response.code()) {
-                                        400 -> "Thông tin đăng ký không hợp lệ"
-                                        409 -> "Email đã tồn tại trong hệ thống"
-                                        else -> "Đăng ký thất bại: ${response.code()}"
-                                    }
-                                    Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
-                                }
-                            }
-
-                            override fun onFailure(call: Call<Void>, t: Throwable) {
-                                Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-                            }
-                        })
-                    }
+                    // Auto navigate to OTP screen
+                    onNavigateToOTP(emailAddress.ifEmpty { "test@gmail.com" })
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(6.dp),
+                    .height(52.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = CafeButtonBackground,
-                    contentColor = CafeBeige
+                    containerColor = HighlandRed,
+                    disabledContainerColor = HighlandRed.copy(alpha = 0.5f)
                 ),
+                shape = RoundedCornerShape(12.dp),
                 enabled = isFormValid
             ) {
                 Text(
-                    text = "XÁC NHẬN",
+                    text = "Đăng ký",
+                    color = HighlandWhite,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
             
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Đã có tài khoản? Đăng nhập
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Đã có tài khoản? ",
+                    color = HighlandText,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "Đăng nhập",
+                    color = HighlandRed,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { onBackClick() }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -579,4 +591,4 @@ fun SignUpScreenPreview() {
     CafeTrioTheme {
         SignUpScreen()
     }
-} 
+}

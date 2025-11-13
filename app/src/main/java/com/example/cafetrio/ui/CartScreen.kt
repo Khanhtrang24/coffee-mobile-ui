@@ -1,24 +1,17 @@
 package com.example.cafetrio.ui
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,89 +21,54 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cafetrio.R
-import com.example.cafetrio.data.api.ApiClient
-import com.example.cafetrio.data.dto.OrderDetail
-import com.example.cafetrio.data.dto.OrderResponse
-import com.example.cafetrio.ui.theme.CafeBeige
-import com.example.cafetrio.ui.theme.CafeBrown
-import com.example.cafetrio.ui.theme.CafeTrioTheme
-import com.example.cafetrio.ui.theme.HighlandWhite
-import com.example.cafetrio.utils.FormatUtils
-import java.text.SimpleDateFormat
-import java.util.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.cafetrio.ui.theme.*
+
+data class MockOrderItem(
+    val id: String,
+    val name: String,
+    val price: Int,
+    val quantity: Int
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
     onBackClick: () -> Unit = {},
-    onNavigateToPayment: (OrderDetail) -> Unit = {}
+    onNavigateToPayment: () -> Unit = {}
 ) {
-    var orders by remember { mutableStateOf<List<OrderDetail>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
-
-    // Gọi API để lấy danh sách đơn hàng
-    LaunchedEffect(Unit) {
-        isLoading = true
-        error = null
-        Log.d("CartScreen", "Calling API: http://10.0.2.2:8080/api/order/me")
-        ApiClient.apiService.getMyOrders().enqueue(object : Callback<OrderResponse> {
-            override fun onResponse(call: Call<OrderResponse>, response: Response<OrderResponse>) {
-                isLoading = false
-                Log.d("CartScreen", "API Response: ${response.code()} - ${response.message()}")
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    Log.d("CartScreen", "Response Body: $body")
-                    if (body != null) {
-                        orders = body.data?.content ?: emptyList()
-                        Log.d("CartScreen", "Orders size: ${orders.size}, OrderItemList size: ${orders.flatMap { it.orderItemList }.size}")
-                    } else {
-                        error = "Không nhận được dữ liệu từ server"
-                    }
-                } else {
-                    error = "Không thể tải đơn hàng: ${response.message()}"
-                }
-            }
-
-            override fun onFailure(call: Call<OrderResponse>, t: Throwable) {
-                isLoading = false
-                error = "Lỗi kết nối: ${t.message}"
-                Log.e("CartScreen", "API Failure: ${t.message}", t)
-            }
-        })
+    val mockOrders = remember {
+        listOf(
+            MockOrderItem("1", "Cà Phê Sữa Đá", 39000, 2),
+            MockOrderItem("2", "Trà Sữa Oolong", 55000, 1),
+            MockOrderItem("3", "Smoothie Xoài", 65000, 1)
+        )
     }
+    val isLoading = false
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Box(
+                    Text(
+                        text = "Giỏ hàng",
+                        color = HighlandWhite,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Danh sách sản phẩm",
-                            color = CafeBrown,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                        textAlign = TextAlign.Center
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Quay lại",
-                            tint = CafeBrown
+                            tint = HighlandWhite
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CafeBeige
+                    containerColor = HighlandRed
                 )
             )
         },
@@ -119,67 +77,10 @@ fun CartScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
+                    color = HighlandRed
                 )
-            } else if (error != null) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = error ?: "Lỗi",
-                        color = CafeBrown,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = {
-                            isLoading = true
-                            error = null
-                            ApiClient.apiService.getMyOrders().enqueue(object : Callback<OrderResponse> {
-                                override fun onResponse(
-                                    call: Call<OrderResponse>,
-                                    response: Response<OrderResponse>
-                                ) {
-                                    isLoading = false
-                                    if (response.isSuccessful) {
-                                        val body = response.body()
-                                        if (body != null) {
-                                            orders = body.data?.content ?: emptyList()
-                                        } else {
-                                            error = "Không nhận được dữ liệu từ server"
-                                        }
-                                    } else {
-                                        error = "Không thể tải đơn hàng: ${response.message()}"
-                                    }
-                                }
-
-                                override fun onFailure(call: Call<OrderResponse>, t: Throwable) {
-                                    isLoading = false
-
-                                    error = when (t) {
-                                        is java.net.UnknownHostException -> "Không thể kết nối đến máy chủ. Kiểm tra mạng."
-                                        is java.net.SocketTimeoutException -> "Hết thời gian chờ. Vui lòng thử lại."
-                                        is javax.net.ssl.SSLHandshakeException -> "Lỗi bảo mật kết nối (SSL)."
-                                        else -> "Lỗi kết nối: ${t.localizedMessage}"
-                                    }
-
-                                    Log.e("CartScreen", "API Failure", t)
-                                }
-                            })
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = CafeBrown),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("Thử lại", color = Color.White, fontSize = 16.sp)
-                    }
-                }
-            } else if (orders.isEmpty() || orders.flatMap { it.orderItemList }.isEmpty()) {
+            } else if (mockOrders.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -196,40 +97,88 @@ fun CartScreen(
                             .padding(bottom = 24.dp)
                     )
                     Text(
-                        text = "Chưa có sản phẩm nào",
+                        text = "Giỏ hàng trống",
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = CafeBrown,
+                        color = HighlandText,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Vui lòng thêm sản phẩm để thanh toán!",
+                        text = "Thêm sản phẩm vào giỏ hàng để tiếp tục!",
                         fontSize = 16.sp,
-                        color = CafeBrown.copy(alpha = 0.7f),
+                        color = HighlandText.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center
                     )
                 }
             } else {
-                LazyColumn(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(horizontal = 16.dp)
                 ) {
-                    items(orders.flatMap { it.orderItemList }) { orderItem ->
-                        OrderItem(
-                            orderItem = orderItem,
-                            totalPrice = orders.firstOrNull { it.orderItemList.contains(orderItem) }?.totalPrice ?: 0,
-                            onClick = {
-                                orders.firstOrNull { it.orderItemList.contains(orderItem) }?.let { order ->
-                                    onNavigateToPayment(order)
-                                }
-                            }
-                        )
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        items(mockOrders) { orderItem ->
+                            CartOrderItem(orderItem = orderItem)
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                     }
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
+
+                    // Tổng tiền và nút Thanh toán
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(20.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Tổng cộng:",
+                                    fontSize = 16.sp,
+                                    color = HighlandText
+                                )
+                                Text(
+                                    text = "159.000đ",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = HighlandRed
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Button(
+                                onClick = onNavigateToPayment,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = HighlandRed
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(
+                                    text = "Thanh toán",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = HighlandWhite
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -238,23 +187,18 @@ fun CartScreen(
 }
 
 @Composable
-fun OrderItem(
-    orderItem: com.example.cafetrio.data.dto.OrderItem,
-    totalPrice: Int,
-    onClick: () -> Unit = {}
-) {
+fun CartOrderItem(orderItem: MockOrderItem) {
+    var quantity by remember { mutableStateOf(orderItem.quantity) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable(onClick = onClick),
+            .padding(vertical = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        ),
-        shape = RoundedCornerShape(12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -262,44 +206,94 @@ fun OrderItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Hình ảnh sản phẩm
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFF5E8C7))
-                    .padding(4.dp),
+                    .size(80.dp)
+                    .background(
+                        HighlandRed.copy(alpha = 0.1f),
+                        RoundedCornerShape(12.dp)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_cart),
-                    contentDescription = "Product Icon",
-                    modifier = Modifier.size(32.dp)
+                    painter = painterResource(id = R.drawable.coffee_beans),
+                    contentDescription = "Product",
+                    modifier = Modifier.size(48.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(12.dp))
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Thông tin sản phẩm
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = orderItem.name ?: "Sản phẩm #${orderItem.id.takeLast(6)}",
+                    text = orderItem.name,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = CafeBrown,
-                    maxLines = 1,
+                    fontWeight = FontWeight.Bold,
+                    color = HighlandText,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
-                    text = "Số lượng: ${orderItem.amount}",
-                    fontSize = 14.sp,
-                    color = CafeBrown.copy(alpha = 0.8f)
+                    text = "${orderItem.price}đ",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HighlandRed
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Điều khiển số lượng
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(
+                            HighlandRed.copy(alpha = 0.1f),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 4.dp, vertical = 4.dp)
+                ) {
+                    // Nút giảm
+                    IconButton(
+                        onClick = { if (quantity > 1) quantity-- },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text(
+                            text = "−",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = HighlandRed
+                        )
+                    }
+
+                    Text(
+                        text = "$quantity",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = HighlandText,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    // Nút tăng
+                    IconButton(
+                        onClick = { quantity++ },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text(
+                            text = "+",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = HighlandRed
+                        )
+                    }
+                }
             }
-            Text(
-                text = FormatUtils.formatPrice(orderItem.price?.toInt() ?: 0),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = CafeBrown
-            )
         }
     }
 }

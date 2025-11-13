@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -31,6 +32,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.cafetrio.R
+import com.example.cafetrio.ui.components.BottomNavBar
+import com.example.cafetrio.ui.components.NavigationItem
 import com.example.cafetrio.ui.theme.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -251,7 +254,8 @@ fun BookedScreen(
                         Image(
                             painter = painterResource(id = R.drawable.ic_menu),
                             contentDescription = "Logo",
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(32.dp),
+                            colorFilter = ColorFilter.tint(HighlandWhite)
                         )
                         
                         Spacer(modifier = Modifier.width(12.dp))
@@ -260,7 +264,7 @@ fun BookedScreen(
                             text = "Danh mục",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color(0xFF553311)
+                            color = HighlandWhite
                         )
                         
                         Spacer(modifier = Modifier.width(4.dp))
@@ -268,7 +272,7 @@ fun BookedScreen(
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "Dropdown",
-                            tint = Color(0xFF553311)
+                            tint = HighlandWhite
                         )
                     }
                 },
@@ -280,10 +284,9 @@ fun BookedScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .width(40.dp)
-                                .height(40.dp)
+                                .size(40.dp)
                                 .background(
-                                    color = Color(0xFFFFFFFF), 
+                                    color = HighlandWhite,
                                     shape = RoundedCornerShape(size = 20.dp)
                                 )
                                 .clickable { showSearchDialog = true },
@@ -304,10 +307,9 @@ fun BookedScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .width(40.dp)
-                                .height(40.dp)
+                                .size(40.dp)
                                 .background(
-                                    color = Color(0xFFFFFFFF), 
+                                    color = HighlandWhite,
                                     shape = RoundedCornerShape(size = 20.dp)
                                 )
                                 .clickable { onFavoritesClick() },
@@ -322,113 +324,22 @@ fun BookedScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor
+                    containerColor = HighlandRed
                 )
             )
         },
         bottomBar = {
-            BottomAppBar(
-                containerColor = backgroundColor,
-                contentColor = CafeBrown
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    // Trang chủ
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { 
-                                onNavigationItemClick("home")
-                            }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_home),
-                            contentDescription = "Home",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = "Trang chủ",
-                            color = Color(0xFFAF8F6F),
-                            fontSize = 12.sp
-                        )
-                    }
-                    
-                    // Đặt hàng (active)
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { onNavigationItemClick("order") }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_booked),
-                            contentDescription = "Order",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = "Đặt hàng",
-                            color = Color(0xFF543310),
-                            fontSize = 12.sp
-                        )
-                        // Active indicator
-                        Box(
-                            modifier = Modifier
-                                .padding(top = 4.dp)
-                                .width(32.dp)
-                                .height(2.dp)
-                                .background(Color(0xFF543310))
-                        )
-                    }
-                    
-                    // Ưu đãi
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { onNavigationItemClick("rewards") }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_voucher),
-                            contentDescription = "Rewards",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = "Ưu đãi",
-                            color = Color(0xFFAF8F6F),
-                            fontSize = 12.sp
-                        )
-                    }
-                    
-                    // Khác
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { onNavigationItemClick("differ") }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_differ),
-                            contentDescription = "More",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = "Khác",
-                            color = Color(0xFFAF8F6F),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-            }
+            BottomNavBar(
+                currentItem = NavigationItem.ORDER,
+                onNavigate = onNavigationItemClick
+            )
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(backgroundColor)
+                .background(HighlandWhite)
                 .verticalScroll(scrollState)
         ) {
             // Category buttons grid - reorganized to 2 rows
@@ -717,7 +628,7 @@ fun CategoryButton(
     scrollState: ScrollState,
     sectionRefs: Map<String, MutableState<Int>>,
     coroutineScope: CoroutineScope,
-    animationDuration: Int = 300 // Default animation duration in ms
+    animationDuration: Int = 300
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -726,7 +637,6 @@ fun CategoryButton(
             .clickable {
                 coroutineScope.launch {
                     sectionRefs[category.id]?.value?.let { position ->
-                        // Calculate scroll distance and use animateScrollBy with slower animation
                         val distance = position - scrollState.value
                         scrollState.animateScrollBy(
                             value = distance.toFloat(),
@@ -736,7 +646,6 @@ fun CategoryButton(
                 }
             }
     ) {
-        // Category icon
         Image(
             painter = painterResource(id = category.imageRes),
             contentDescription = category.title,
@@ -748,12 +657,11 @@ fun CategoryButton(
         
         Spacer(modifier = Modifier.height(4.dp))
         
-        // Category name
         Text(
             text = category.title,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
-            color = Color(0xFF553311),
+            color = HighlandText,
             lineHeight = 14.sp
         )
     }
@@ -768,7 +676,6 @@ fun ProductItem(product: Product) {
             .clickable { /* Handle product click */ },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Product image
         Box {
             Image(
                 painter = painterResource(id = product.imageRes),
@@ -779,18 +686,17 @@ fun ProductItem(product: Product) {
                 contentScale = ContentScale.Crop
             )
             
-            // New tag
             if (product.isNew) {
                 Box(
                     modifier = Modifier
                         .padding(4.dp)
-                        .background(Color.Red, RoundedCornerShape(4.dp))
+                        .background(HighlandRed, RoundedCornerShape(4.dp))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                         .align(Alignment.TopStart)
                 ) {
                     Text(
                         text = "NEW",
-                        color = Color.White,
+                        color = HighlandWhite,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -800,15 +706,12 @@ fun ProductItem(product: Product) {
         
         Spacer(modifier = Modifier.width(12.dp))
         
-        // Product details
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = product.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF553311),
+                color = HighlandText,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -819,7 +722,7 @@ fun ProductItem(product: Product) {
                 text = product.price,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF553311)
+                color = HighlandRed
             )
         }
     }
@@ -841,148 +744,46 @@ fun SearchDialog(
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
+                .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
-            color = Color(0xFFF8F1DF)
+            color = HighlandWhite
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier = Modifier.padding(16.dp)
             ) {
-                // Header
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Tìm kiếm",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF543310)
-                    )
-                    
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            tint = Color(0xFF543310)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Search input field
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    placeholder = {
-                        Text(
-                            text = "Nhập từ khóa tìm kiếm...",
-                            color = Color.Gray
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_search),
-                            contentDescription = "Search",
-                            tint = Color(0xFF543310),
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    trailingIcon = if (searchQuery.isNotEmpty()) {
-                        {
-                            IconButton(
-                                onClick = { onSearchQueryChange("") }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Clear search",
-                                    tint = Color.Gray
-                                )
-                            }
-                        }
-                    } else null,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF543310),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
+                Text(
+                    text = "Tìm kiếm",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HighlandText
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Search suggestions or recent searches
-                Column {
-                    Text(
-                        text = "Tìm kiếm gần đây",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF543310),
-                        modifier = Modifier.padding(bottom = 8.dp)
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = onSearchQueryChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("Nhập tên sản phẩm...") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = HighlandRed,
+                        unfocusedBorderColor = HighlandText.copy(alpha = 0.3f)
                     )
-                    
-                    // Recent search items
-                    RecentSearchItem(
-                        text = "Cà phê sữa",
-                        onClick = {
-                            onSearchQueryChange("Cà phê sữa")
-                        }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = HighlandRed
                     )
-                    RecentSearchItem(
-                        text = "Trà sữa",
-                        onClick = {
-                            onSearchQueryChange("Trà sữa")
-                        }
-                    )
-                    RecentSearchItem(
-                        text = "Smoothie",
-                        onClick = {
-                            onSearchQueryChange("Smoothie")
-                        }
-                    )
+                ) {
+                    Text("Đóng", color = HighlandWhite)
                 }
             }
         }
-    }
-}
-
-@Composable
-fun RecentSearchItem(
-    text: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.KeyboardArrowDown,
-            contentDescription = "Recent search",
-            tint = Color.Gray,
-            modifier = Modifier.size(20.dp)
-        )
-        
-        Text(
-            text = text,
-            fontSize = 14.sp,
-            color = Color(0xFF543310)
-        )
     }
 }
 
@@ -996,37 +797,24 @@ fun CategorySheetItem(
         modifier = Modifier
             .width(100.dp)
             .clickable(onClick = onClick)
-            .padding(8.dp)
     ) {
-        // Category image
-        Box(
+        Image(
+            painter = painterResource(id = category.imageRes),
+            contentDescription = category.title,
             modifier = Modifier
-                .size(80.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White)
-                .padding(8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = category.imageRes),
-                contentDescription = category.title,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        // Category name
+                .size(70.dp)
+                .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
         Text(
-            text = category.title.replace("\n", " "),
-            fontSize = 14.sp,
+            text = category.title,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center,
-            color = Color(0xFF553311),
-            maxLines = 2,
-            lineHeight = 18.sp
+            color = HighlandText,
+            lineHeight = 14.sp
         )
     }
-} 
+}
