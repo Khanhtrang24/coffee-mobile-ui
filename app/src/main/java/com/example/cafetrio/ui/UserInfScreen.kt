@@ -40,7 +40,7 @@ fun UserInfScreen(
     onUpdateInfoClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {}
 ) {
-    var name by remember { mutableStateOf("Tuấn Nguyễn") }
+    var name by remember { mutableStateOf("Nguyen Phan") }
     var email by remember { mutableStateOf("") }
     var birthDate by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
@@ -113,7 +113,7 @@ fun UserInfScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(HighlandRed)
-                    .padding(24.dp),
+                    .padding(28.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Avatar with edit badge

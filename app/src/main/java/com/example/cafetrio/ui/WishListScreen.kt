@@ -29,11 +29,6 @@ import com.example.cafetrio.ui.theme.*
 fun WishListScreen(
     onBackClick: () -> Unit = {}
 ) {
-    // Comment API call và dùng mock data
-    // val wishlistManager = WishlistManager.getInstance()
-    // val wishlistItems by wishlistManager.wishlistItems.collectAsState()
-
-    // Mock data for preview
     val wishlistItems = remember {
         listOf(
             WishlistItem(

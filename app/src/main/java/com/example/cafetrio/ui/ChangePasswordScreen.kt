@@ -10,6 +10,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,56 +54,20 @@ fun ChangePasswordScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+    var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     
     // Check if passwords match
     val passwordsMatch = password == confirmPassword && password.isNotEmpty()
     
-    // Function to handle password reset - COMMENT API và auto pass
-    val handleResetPassword = handleReset@ {
-        // if (passwordsMatch) {
-        //     if (email.isEmpty()) {
-        //         Toast.makeText(context, "Email không hợp lệ, vui lòng thử lại", Toast.LENGTH_SHORT).show()
-        //         return@handleReset
-        //     }
-        //
-        //     isLoading = true
-        //     val request = ResetPasswordRequest(
-        //         email = email,
-        //         password = password,
-        //         passwordConfirm = confirmPassword
-        //     )
-        //
-        //     ApiClient.apiService.resetPassword(email, request).enqueue(object : Callback<Void> {
-        //         override fun onResponse(call: Call<Void>, response: Response<Void>) {
-        //             isLoading = false
-        //             if (response.isSuccessful) {
-        //                 Toast.makeText(context, "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show()
-        //                 onChangePasswordSubmit()
-        //             } else {
-        //                 val errorMsg = when(response.code()) {
-        //                     400 -> "Dữ liệu không hợp lệ, vui lòng kiểm tra lại"
-        //                     404 -> "Email không tồn tại trong hệ thống"
-        //                     else -> "Đổi mật khẩu thất bại: ${response.code()}"
-        //                 }
-        //                 Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
-        //             }
-        //         }
-        //
-        //         override fun onFailure(call: Call<Void>, t: Throwable) {
-        //             isLoading = false
-        //             Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-        //         }
-        //     })
-        // } else {
-        //     Toast.makeText(context, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show()
-        // }
-
-        // Auto pass
-        Toast.makeText(context, "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show()
-        onChangePasswordSubmit()
+    val handleResetPassword = {
+        if (passwordsMatch) {
+            Toast.makeText(context, "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show()
+            onChangePasswordSubmit()
+        } else {
+            Toast.makeText(context, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show()
+        }
     }
     
     Box(
@@ -122,15 +88,6 @@ fun ChangePasswordScreen(
                 .padding(32.dp)
         )
         
-        // Hiển thị loading khi đang xử lý API
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                color = CafeBrown
-            )
-        }
-        
-        // Nội dung chính - căn giữa màn hình
         Column(
             modifier = Modifier
                 .fillMaxWidth()

@@ -29,13 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cafetrio.R
 import com.example.cafetrio.data.AuthManager
-import com.example.cafetrio.data.api.ApiClient
-import com.example.cafetrio.data.dto.LoginRequest
-import com.example.cafetrio.data.dto.LoginResponse
 import com.example.cafetrio.ui.theme.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
 @Composable
@@ -52,9 +46,7 @@ fun LoginScreen(
     var email by remember { mutableStateOf(authManager.getSavedEmail()) }
     var password by remember { mutableStateOf(authManager.getSavedPassword()) }
     var rememberMe by remember { mutableStateOf(authManager.isRememberMeEnabled()) }
-
     var passwordVisible by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -216,56 +208,8 @@ fun LoginScreen(
             // Nút đăng nhập
             Button(
                 onClick = { 
-                    // HARD-CODE AUTO LOGIN - Comment API logic
-                    Toast.makeText(context, "Auto login - Đang chuyển đến màn hình chính...", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
                     onLoginClick()
-
-                    // ORIGINAL LOGIN LOGIC - COMMENTED
-                    // if (email.isNotEmpty() && password.isNotEmpty()) {
-                    //     isLoading = true
-                    //
-                    //     // Kiểm tra admin (đơn giản)
-                    //     if (email == "gm.giaphu@gmail.com" && password == "admin") {
-                    //         authManager.saveLoginCredentials(email, password, rememberMe)
-                    //         Toast.makeText(context, "Đăng nhập quản trị thành công!", Toast.LENGTH_SHORT).show()
-                    //         onLoginClick()
-                    //         isLoading = false
-                    //     } else {
-                    //         val loginRequest = LoginRequest(
-                    //             email = email,
-                    //             password = password,
-                    //             rememberMe = rememberMe
-                    //         )
-                    //
-                    //         ApiClient.apiService.login(loginRequest).enqueue(object : Callback<LoginResponse> {
-                    //             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                    //                 isLoading = false
-                    //                 if (response.isSuccessful) {
-                    //                     val loginResponse = response.body()
-                    //                     if (loginResponse != null) {
-                    //                         authManager.saveLoginCredentials(email, password, rememberMe)
-                    //                         Toast.makeText(context, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
-                    //                         onLoginClick()
-                    //                     }
-                    //                 } else {
-                    //                     val errorMsg = when(response.code()) {
-                    //                         401 -> "Email hoặc mật khẩu không đúng"
-                    //                         404 -> "Tài khoản không tồn tại"
-                    //                         else -> "Đăng nhập thất bại: ${response.code()}"
-                    //                     }
-                    //                     Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
-                    //                 }
-                    //             }
-                    //
-                    //             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                    //                 isLoading = false
-                    //                 Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-                    //             }
-                    //         })
-                    //     }
-                    // } else {
-                    //     Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
-                    // }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -273,22 +217,13 @@ fun LoginScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = CafeButtonBackground
                 ),
-                shape = RoundedCornerShape(6.dp),
-                enabled = !isLoading
+                shape = RoundedCornerShape(6.dp)
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = CafeBeige,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = "Đăng Nhập (Auto)",
-                        color = CafeBeige,
-                        fontSize = 16.sp
-                    )
-                }
+                Text(
+                    text = "Đăng Nhập",
+                    color = CafeBeige,
+                    fontSize = 16.sp
+                )
             }
             
             // Phần đăng ký tài khoản mới

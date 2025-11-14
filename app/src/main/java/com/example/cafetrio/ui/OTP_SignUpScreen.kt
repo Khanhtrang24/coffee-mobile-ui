@@ -67,54 +67,13 @@ fun OTP_SignUpScreen(
     val seconds = timeRemaining % 60
     val timeString = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
     
-    // Hàm xử lý khi nhấn xác nhận OTP - COMMENT API và auto pass
     val handleVerifyOtp = {
-        // isLoading = true
-
-        // ApiClient.apiService.verifyOtp(otpValue).enqueue(object : Callback<Void> {
-        //     override fun onResponse(call: Call<Void>, response: Response<Void>) {
-        //         isLoading = false
-        //         if (response.isSuccessful) {
-        //             Toast.makeText(context, "Xác thực OTP thành công!", Toast.LENGTH_SHORT).show()
-        //             onVerifyOtp(otpValue)
-        //         } else {
-        //             Toast.makeText(context, "Mã OTP không đúng hoặc đã hết hạn", Toast.LENGTH_SHORT).show()
-        //         }
-        //     }
-        //
-        //     override fun onFailure(call: Call<Void>, t: Throwable) {
-        //         isLoading = false
-        //         Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-        //     }
-        // })
-
-        // Auto pass OTP verification
         Toast.makeText(context, "Xác thực OTP thành công!", Toast.LENGTH_SHORT).show()
         onVerifyOtp(otpValue.ifEmpty { "123456" })
     }
     
-    // Hàm gửi lại OTP - COMMENT API
     val handleResendOtp = {
         if (isResendEnabled || timeRemaining <= 0) {
-            // val request = ResendOtpRequest(email = emailAddress)
-
-            // ApiClient.apiService.resendOtp(request).enqueue(object : Callback<Void> {
-            //     override fun onResponse(call: Call<Void>, response: Response<Void>) {
-            //         if (response.isSuccessful) {
-            //             Toast.makeText(context, "Đã gửi lại mã OTP", Toast.LENGTH_SHORT).show()
-            //             timeRemaining = 120 // Reset thời gian đếm ngược
-            //             isResendEnabled = false
-            //         } else {
-            //             Toast.makeText(context, "Không thể gửi lại mã OTP: ${response.code()}", Toast.LENGTH_SHORT).show()
-            //         }
-            //     }
-            //
-            //     override fun onFailure(call: Call<Void>, t: Throwable) {
-            //         Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-            //     }
-            // })
-
-            // Auto pass resend OTP
             Toast.makeText(context, "Đã gửi lại mã OTP", Toast.LENGTH_SHORT).show()
             timeRemaining = 120
             isResendEnabled = false

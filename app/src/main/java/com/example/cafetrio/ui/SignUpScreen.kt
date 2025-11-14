@@ -34,8 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cafetrio.R
-import com.example.cafetrio.data.api.ApiClient
-import com.example.cafetrio.data.dto.RegisterRequest
 import com.example.cafetrio.ui.theme.CafeBeige
 import com.example.cafetrio.ui.theme.CafeBrown
 import com.example.cafetrio.ui.theme.CafeButtonBackground
@@ -47,9 +45,6 @@ import com.example.cafetrio.ui.theme.HighlandWhite
 import com.example.cafetrio.ui.theme.HighlandText
 import java.text.SimpleDateFormat
 import java.util.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,17 +117,13 @@ fun SignUpScreen(
         updateDate(currentYear - 18, calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
     }
     
-    // Form validation - COMMENT OUT để auto pass
-    // val isFormValid = emailAddress.isNotEmpty() &&
-    //                  phoneNumber.isNotEmpty() &&
-    //                  fullName.isNotEmpty() &&
-    //                  birthday.isNotEmpty() &&
-    //                  gender.isNotEmpty() &&
-    //                  password.isNotEmpty() &&
-    //                  password == confirmPassword
-
-    // Auto pass validation - cho phép đi tiếp ngay cả khi chưa điền đủ
-    val isFormValid = true
+    val isFormValid = emailAddress.isNotEmpty() &&
+                     phoneNumber.isNotEmpty() &&
+                     fullName.isNotEmpty() &&
+                     birthday.isNotEmpty() &&
+                     gender.isNotEmpty() &&
+                     password.isNotEmpty() &&
+                     password == confirmPassword
 
     Box(
         modifier = Modifier
@@ -525,19 +516,6 @@ fun SignUpScreen(
             // Nút Đăng ký
             Button(
                 onClick = {
-                    // Comment API call và auto navigate
-                    // focusManager.clearFocus()
-                    // val registerRequest = RegisterRequest(
-                    //     email = emailAddress,
-                    //     phone = phoneNumber,
-                    //     fullName = fullName,
-                    //     birthday = birthday,
-                    //     gender = gender,
-                    //     password = password
-                    // )
-                    // ApiClient.apiService.register(registerRequest).enqueue(...)
-
-                    // Auto navigate to OTP screen
                     onNavigateToOTP(emailAddress.ifEmpty { "test@gmail.com" })
                 },
                 modifier = Modifier

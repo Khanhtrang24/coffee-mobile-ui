@@ -168,36 +168,6 @@ fun ForgotPasswordScreen(
                 // Nút xác nhận
                 Button(
                     onClick = { 
-                        // COMMENT API và auto pass
-                        // if (emailAddress.isNotEmpty()) {
-                        //     isLoading = true
-                        //
-                        //     ApiClient.apiService.forgotPassword(emailAddress).enqueue(object : Callback<Void> {
-                        //         override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                        //             isLoading = false
-                        //             if (response.isSuccessful) {
-                        //                 Toast.makeText(context, "Mã xác nhận đã được gửi đến email của bạn", Toast.LENGTH_SHORT).show()
-                        //                 onSubmitEmail(emailAddress)
-                        //             } else {
-                        //                 val errorMsg = when(response.code()) {
-                        //                     404 -> "Email không tồn tại trong hệ thống"
-                        //                     429 -> "Đã gửi quá nhiều yêu cầu, vui lòng thử lại sau"
-                        //                     else -> "Lỗi: ${response.code()}"
-                        //                 }
-                        //                 Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
-                        //             }
-                        //         }
-                        //
-                        //         override fun onFailure(call: Call<Void>, t: Throwable) {
-                        //             isLoading = false
-                        //             Toast.makeText(context, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-                        //         }
-                        //     })
-                        // } else {
-                        //     Toast.makeText(context, "Vui lòng nhập địa chỉ email", Toast.LENGTH_SHORT).show()
-                        // }
-
-                        // Auto pass
                         Toast.makeText(context, "Mã xác nhận đã được gửi đến email của bạn", Toast.LENGTH_SHORT).show()
                         onSubmitEmail(emailAddress.ifEmpty { "test@gmail.com" })
                     },

@@ -7,9 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -23,12 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +35,6 @@ import com.example.cafetrio.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.tween
-import androidx.compose.ui.platform.LocalContext
 
 // Mock data models
 data class MockProduct(
@@ -60,19 +53,10 @@ fun MainScreen(
     onNavigate: (String) -> Unit = {},
     onNavigateToNoti: () -> Unit = {}
 ) {
-
-    val userName = "NGUYEN DINH TUAN"
-    val userCode = "CFT02809"
+    val userName = "Nguyen Phan"
     val beanCount = 88
-
-    // Comment API call và dùng mock data
-    // val mustTryProducts = remember { mutableStateListOf<ProductResponse>() }
-    // val context = LocalContext.current
-    // LaunchedEffect(true) {
-    //     ApiClient.apiService.getMustTryProducts().enqueue(...)
-    // }
+    var selectedCategory by remember { mutableStateOf("Tất cả") }
     
-    // Mock data for products
     val mustTryProducts = remember {
         listOf(
             MockProduct("1", "Smoothie Xoài Nhiệt Đới", "65.000đ", R.drawable.xoai_granola, true),
@@ -91,88 +75,102 @@ fun MainScreen(
         R.drawable.ad_6,
         R.drawable.ad_7
     )
+    
+    val categories = listOf("Tất cả", "Cà phê", "Trà sữa", "Smoothie", "Khác")
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Brew Co",
+            // Simplified header
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
                         color = HighlandWhite,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily(Font(R.font.agbalumo_regular))
-                    )
-                },
-                actions = {
-                    // Voucher Button
-                    Box(
-                        modifier = Modifier.padding(end = 12.dp),
-                        contentAlignment = Alignment.Center
+                shadowElevation = 4.dp
                     ) {
                         Row(
                             modifier = Modifier
-                                .width(70.dp)
-                                .height(40.dp)
-                                .background(
-                                    color = HighlandWhite, 
-                                    shape = RoundedCornerShape(size = 25.dp)
-                                )
-                                .clickable { onNavigate("rewards") },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Chào, $userName",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = HighlandText
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Image(
-                                painter = painterResource(id = R.drawable.ic_coupon),
-                                contentDescription = "Vouchers",
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .padding(start = 4.dp)
+                                painter = painterResource(id = R.drawable.coffee_beans),
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
                             )
-                            
+                            Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "11", 
+                                text = "$beanCount Bean",
+                                fontSize = 13.sp,
                                 color = HighlandRed,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(start = 4.dp, end = 8.dp)
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }
                     
-                    // Notification button
-                    Box(
-                        modifier = Modifier.padding(end = 16.dp),
-                        contentAlignment = Alignment.Center
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Voucher icon
                         Box(
                             modifier = Modifier
                                 .size(40.dp)
-                                .background(
-                                    color = HighlandWhite, 
-                                    shape = RoundedCornerShape(size = 20.dp)
-                                )
+                                .background(HighlandRed.copy(alpha = 0.1f), CircleShape)
+                                .clickable { onNavigate("rewards") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_coupon),
+                                contentDescription = "Vouchers",
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        
+                        // Notification icon
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(HighlandRed.copy(alpha = 0.1f), CircleShape)
                                 .clickable { onNavigateToNoti() },
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
                                 painter = painterResource(id = R.drawable.ic_noti),
                                 contentDescription = "Notifications",
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HighlandRed
-                )
-            )
+                }
+            }
         },
         bottomBar = {
             BottomNavBar(
                 currentItem = NavigationItem.HOME,
                 onNavigate = onNavigate
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onNavigate("orders") },
+                containerColor = HighlandRed,
+                contentColor = HighlandWhite
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.invoice),
+                    contentDescription = "Cart",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     ) { paddingValues ->
         val scrollState = rememberScrollState()
@@ -180,207 +178,136 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(HighlandWhite) // Nền trắng
+                .background(Color(0xFFF5F5F5))
                 .verticalScroll(scrollState)
         ) {
-            // User Profile Card - Compact design
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.Transparent
-                ),
-                shape = RoundedCornerShape(16.dp)
-            ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // Promotional Banner Carousel - Larger and more prominent
+            val pagerState = rememberPagerState(pageCount = { adImages.size })
+            val coroutineScope = rememberCoroutineScope()
+            
+            LaunchedEffect(Unit) {
+                while(true) {
+                    delay(3500)
+                    val nextPage = (pagerState.currentPage + 1) % adImages.size
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(
+                            page = nextPage,
+                            animationSpec = tween(durationMillis = 600)
+                        )
+                    }
+                }
+            }
+                
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    HighlandRed,
-                                    HighlandDarkRed
-                                )
-                            )
-                        )
-                        .padding(20.dp)
+                    .height(200.dp)
+                    .padding(horizontal = 16.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize()
+                    ) { page ->
+                    Card(
+                        modifier = Modifier.fillMaxSize(),
+                        shape = RoundedCornerShape(20.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                        // Left - User info
-                        Column {
-                            Text(
-                                text = userName,
-                                color = HighlandWhite,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            
-                            Spacer(modifier = Modifier.height(4.dp))
-                            
-                            Text(
-                                text = "Mã TV: $userCode",
-                                color = HighlandWhite.copy(alpha = 0.9f),
-                                fontSize = 13.sp
-                            )
-                        }
-                        
-                        // Right - Bean balance
-                        Column(
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            Text(
-                                text = "$beanCount",
-                                color = HighlandWhite,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "BEAN",
-                                color = HighlandWhite.copy(alpha = 0.9f),
-                                fontSize = 12.sp
-                            )
-                        }
+                        Image(
+                            painter = painterResource(id = adImages[page]),
+                            contentDescription = "Promotion",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    }
+                    
+                // Modern page indicators
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp)
+                        .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        repeat(adImages.size) { index ->
+                            Box(
+                                modifier = Modifier
+                                .padding(horizontal = 2.dp)
+                                .width(if (pagerState.currentPage == index) 20.dp else 6.dp)
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(3.dp))
+                                    .background(
+                                    if (pagerState.currentPage == index) HighlandWhite else HighlandWhite.copy(alpha = 0.5f)
+                                )
+                        )
                     }
                 }
             }
             
-            // Quick Action Buttons - Redesigned grid
-            Column(
+            Spacer(modifier = Modifier.height(20.dp))
+            
+            // Quick Service Icons - Horizontal scroll
+            LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "Dịch vụ",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = HighlandText,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-                
-                // First row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    QuickActionButton(
+                item {
+                    ServiceIconCard(
                         icon = R.drawable.shipping,
-                        text = "Giao hàng",
+                        label = "Giao hàng",
                         onClick = { onNavigate("order") },
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    QuickActionButton(
-                        icon = R.drawable.take_away,
-                        text = "Mang đi",
-                        onClick = { onNavigate("order") },
-                        modifier = Modifier.weight(1f)
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                // Second row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    QuickActionButton(
-                        icon = R.drawable.invoice,
-                        text = "Đơn hàng",
-                        onClick = { onNavigate("orders") },
-                        modifier = Modifier.weight(1f)
+                item {
+                    ServiceIconCard(
+                        icon = R.drawable.take_away,
+                        label = "Mang đi",
+                        onClick = { onNavigate("order") }
                     )
-                    
-                    QuickActionButton(
+                }
+                item {
+                    ServiceIconCard(
                         icon = R.drawable.coffee_beans,
-                        text = "Đổi Bean",
-                        onClick = { onNavigate("rewards") },
-                        modifier = Modifier.weight(1f)
+                        label = "Đổi Bean",
+                        onClick = { onNavigate("rewards") }
+                    )
+                }
+                item {
+                    ServiceIconCard(
+                        icon = R.drawable.ic_gift,
+                        label = "Ưu đãi",
+                        onClick = { onNavigate("rewards") }
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(20.dp))
+            
+            // Category Tabs
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(categories) { category ->
+                    CategoryChip(
+                        text = category,
+                        selected = category == selectedCategory,
+                        onClick = { selectedCategory = category }
                     )
                 }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Advertisement Carousel
-            val pagerState = rememberPagerState(pageCount = { adImages.size })
-            val coroutineScope = rememberCoroutineScope()
-            
-            // Auto slide
-            LaunchedEffect(Unit) {
-                while(true) {
-                    delay(3000)
-                    val nextPage = (pagerState.currentPage + 1) % adImages.size
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(
-                            page = nextPage,
-                            animationSpec = tween(durationMillis = 800)
-                        )
-                    }
-                }
-            }
-            
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "Ưu đãi đặc biệt",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = HighlandText,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-                
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp)
-                ) {
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize()
-                    ) { page ->
-                        Image(
-                            painter = painterResource(id = adImages[page]),
-                            contentDescription = "Advertisement",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp)
-                                .clip(RoundedCornerShape(16.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                    
-                    // Indicators
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 12.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        repeat(adImages.size) { index ->
-                            Box(
-                                modifier = Modifier
-                                    .padding(horizontal = 3.dp)
-                                    .size(if (pagerState.currentPage == index) 8.dp else 6.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (pagerState.currentPage == index) HighlandWhite 
-                                        else HighlandWhite.copy(alpha = 0.5f)
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // Món Mới Phải Thử Section
+            // Featured Products Section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -392,16 +319,23 @@ fun MainScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Món Mới Phải Thử",
+                        text = "Món Nổi Bật",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = HighlandText
                     )
-                    
-                    TextButton(onClick = { onNavigate("order") }) {
+
+                    TextButton(
+                        onClick = { onNavigate("order") },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier
+                            .background(HighlandRed, shape = RoundedCornerShape(20.dp))
+                            //.padding(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
                         Text(
                             text = "Xem tất cả",
-                            color = HighlandRed,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -410,172 +344,181 @@ fun MainScreen(
                 
                 Spacer(modifier = Modifier.height(12.dp))
                 
-                // Grid 2 columns
-                val productChunks = mustTryProducts.chunked(2)
-                productChunks.forEach { rowItems ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        rowItems.forEach { product ->
-                            ProductCard(
-                                product = product,
-                                onClick = { onNavigate("product/${product.id}") },
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                        
-                        if (rowItems.size == 1) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
-                    }
-                    
+                // Vertical list of products
+                mustTryProducts.forEach { product ->
+                    ModernProductCard(
+                        product = product,
+                        onClick = { onNavigate("product/${product.id}") }
+                    )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
 
+// New modern components
 @Composable
-fun QuickActionButton(
+fun ServiceIconCard(
     icon: Int,
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    label: String,
+    onClick: () -> Unit
 ) {
-    Card(
-        modifier = modifier
-            .height(100.dp)
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .width(80.dp)
+            .clickable(onClick = onClick)
     ) {
-        Column(
+
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .size(64.dp)
+                .shadow(
+                    elevation = 4.dp,
+                    shape = RoundedCornerShape(16.dp),
+                    clip = false
+                )
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.White),
+            contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = icon),
-                contentDescription = text,
-                modifier = Modifier.size(40.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = text,
-                color = HighlandText,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center
+                contentDescription = label,
+                modifier = Modifier.size(32.dp)
             )
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = HighlandText,
+            textAlign = TextAlign.Center,
+            maxLines = 1
+        )
     }
 }
 
 @Composable
-fun ProductCard(
+fun CategoryChip(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = if (selected) HighlandRed else Color.White,
+        shadowElevation = if (selected) 4.dp else 2.dp
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+            color = if (selected) HighlandWhite else HighlandText,
+            fontSize = 14.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+fun ModernProductCard(
     product: MockProduct,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     Card(
-        modifier = modifier.clickable { onClick() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Image
+            // Product Image
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
+                    .size(90.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(HighlandRed.copy(alpha = 0.05f))
             ) {
                 Image(
                     painter = painterResource(id = product.imageRes),
                     contentDescription = product.name,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
+                    modifier = Modifier.fillMaxSize()
                 )
-
+                
                 if (product.isNew) {
                     Box(
                         modifier = Modifier
-                            .padding(8.dp)
-                            .align(Alignment.TopStart)
+                            .padding(6.dp)
                             .background(HighlandRed, RoundedCornerShape(6.dp))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = "NEW",
                             color = HighlandWhite,
-                            fontSize = 10.sp,
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
                 }
             }
-
-            // Info
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            // Product Info
             Column(
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = product.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
                     color = HighlandText,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 2,
-                    minLines = 2
+                    maxLines = 2
                 )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = product.price,
-                        color = HighlandRed,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .background(HighlandRed, CircleShape)
-                            .clickable { /* Add to cart */ },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.button_plus),
-                            contentDescription = "Add",
-                            // Remove tint to show original icon color
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = product.price,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HighlandRed
+                )
+            }
+            
+            // Add button
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    //.background(HighlandRed, CircleShape)
+                    .clickable { /* Add to cart */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.button_plus),
+                    contentDescription = "Add",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
