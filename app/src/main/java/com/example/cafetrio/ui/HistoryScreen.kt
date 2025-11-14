@@ -39,7 +39,6 @@ enum class OrderStatus {
 fun HistoryScreen(
     onBackClick: () -> Unit = {}
 ) {
-    // Comment API và dùng mock data
     val orderHistory = remember {
         listOf(
             OrderHistoryItem("1", "10/04", listOf("1 Smoothie Xoài Nhiệt Đới"), OrderStatus.DELIVERING),

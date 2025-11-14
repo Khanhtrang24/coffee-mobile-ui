@@ -20,13 +20,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
 import com.example.cafetrio.R
 import com.example.cafetrio.ui.theme.*
 import com.example.cafetrio.ui.components.BottomNavBar
@@ -38,486 +37,505 @@ fun CouponScreen(
     onBackClick: () -> Unit = {},
     onNavigationItemClick: (String) -> Unit = {}
 ) {
-    val backgroundColor = HighlandWhite
-    val userName = "NGUYEN DINH TUAN"
+    val userName = "Nguyen Phan"
     val beanCount = 88
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabs = listOf("Voucher của tôi", "Đổi Bean", "Lịch sử")
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Ưu đãi",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = HighlandWhite
-                    )
-                },
-                actions = {
-                    // Notification button
-                    Box(
-                        modifier = Modifier.padding(end = 16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(
-                                    color = HighlandWhite,
-                                    shape = RoundedCornerShape(size = 20.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(HighlandRed)
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Ưu đãi & Điểm thưởng",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = HighlandWhite
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Image(
-                                painter = painterResource(id = R.drawable.ic_noti),
-                                contentDescription = "Notifications",
-                                modifier = Modifier.size(24.dp)
+                                painter = painterResource(id = R.drawable.coffee_beans),
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                colorFilter = ColorFilter.tint(HighlandWhite)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "$beanCount Bean",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = HighlandWhite
                             )
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HighlandRed
-                )
-            )
+                }
+                
+                // Tabs
+                TabRow(
+                    selectedTabIndex = selectedTab,
+                    containerColor = HighlandRed,
+                    contentColor = HighlandWhite,
+                    indicator = { tabPositions ->
+                        if (selectedTab < tabPositions.size) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentSize(Alignment.BottomStart)
+                                    .offset(x = tabPositions[selectedTab].left)
+                                    .width(tabPositions[selectedTab].width)
+                                    .height(3.dp)
+                                    .padding(horizontal = 20.dp)
+                                    .background(HighlandWhite, RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
+                            )
+                        }
+                    }
+                ) {
+                    tabs.forEachIndexed { index, title ->
+                        Tab(
+                            selected = selectedTab == index,
+                            onClick = { selectedTab = index },
+                            text = {
+                                Text(
+                                    text = title,
+                                    fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        )
+                    }
+                }
+            }
         },
         bottomBar = {
             BottomNavBar(
                 currentItem = NavigationItem.REWARDS,
                 onNavigate = onNavigationItemClick
             )
-        }
+        },
+        containerColor = Color(0xFFF5F5F5)
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(backgroundColor)
-                .verticalScroll(rememberScrollState())
+        when (selectedTab) {
+            0 -> VoucherTab(paddingValues)
+            1 -> ExchangeBeanTab(beanCount, paddingValues)
+            2 -> HistoryTab(paddingValues)
+        }
+    }
+}
+
+@Composable
+fun VoucherTab(paddingValues: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Voucher khả dụng",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = HighlandText,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+        
+        ModernVoucherCard(
+            discountText = "30%",
+            titleText = "Giảm 30% toàn bộ Menu Nước Size Lớn",
+            expiryDate = "HSD: 23/04/2024",
+            imageRes = R.drawable.vc_1
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        ModernVoucherCard(
+            discountText = "40%",
+            titleText = "Giảm 40% + Freeship Đơn Từ 10 Ly",
+            expiryDate = "HSD: 30/04/2024",
+            imageRes = R.drawable.vc_2,
+            hasFreeship = true
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        ModernVoucherCard(
+            discountText = "30%",
+            titleText = "Giảm 30% + Freeship Đơn Từ 3 Ly",
+            expiryDate = "HSD: 30/04/2024",
+            imageRes = R.drawable.vc_3,
+            hasFreeship = true
+        )
+    }
+}
+
+@Composable
+fun ExchangeBeanTab(beanCount: Int, paddingValues: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        // Bean balance card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
         ) {
-            // User card with Brew Co branding
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                HighlandRed,
-                                HighlandDarkRed
-                            )
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(HighlandRed, HighlandDarkRed)
                         )
                     )
-                    .padding(16.dp)
+                    .padding(24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    // User info section
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = "Chào bạn,",
-                                fontSize = 16.sp,
-                                color = HighlandWhite
-                            )
-                            Text(
-                                text = userName,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = HighlandWhite
-                            )
-                        }
-                        
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "$beanCount BEAN",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = HighlandWhite
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Membership card
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(HighlandWhite)
-                            .padding(16.dp)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Brew Co",
-                                color = HighlandRed,
-                                fontSize = 32.sp,
-                                fontFamily = FontFamily(Font(R.font.agbalumo_regular)),
-                                textAlign = TextAlign.Center
-                            )
-                            
-                            Spacer(modifier = Modifier.height(8.dp))
-                            
-                            Text(
-                                text = "BRONZE CLASS",
-                                color = HighlandDarkRed,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
-                            )
-                            
-                            Spacer(modifier = Modifier.height(8.dp))
-                            
-                            Text(
-                                text = "MEMBERSHIP CARD",
-                                color = HighlandText,
-                                fontSize = 14.sp,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Bean info and voucher button
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Còn 100 BEAN nữa bạn sẽ thăng hạng.\nĐổi quà không ảnh hưởng tới việc thăng hạng\ncủa bạn",
-                            color = HighlandWhite,
-                            fontSize = 12.sp,
-                            modifier = Modifier.weight(1f)
-                        )
-                        
-                        // Voucher button
-                        Button(
-                            onClick = { /* TODO: Handle voucher click */ },
-                            modifier = Modifier.wrapContentSize(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = HighlandWhite
-                            ),
-                            shape = RoundedCornerShape(16.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_voucher),
-                                    contentDescription = "Vouchers",
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                
-                                Spacer(modifier = Modifier.width(4.dp))
-
-                                Text(
-                                    text = "Voucher của tôi",
-                                    color = HighlandRed,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Function buttons in a grid layout
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            ) {
-                // First row with two buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FunctionButton(
-                        icon = R.drawable.ic_crown,
-                        title = "Hạng thành viên",
-                        onClick = { /* TODO */ },
-                        iconColor = HighlandRed,
-                        modifier = Modifier.weight(1f)
+                Column {
+                    Text(
+                        text = "Bean hiện có",
+                        fontSize = 14.sp,
+                        color = HighlandWhite.copy(alpha = 0.9f)
                     )
-                    
-                    FunctionButton(
-                        icon = R.drawable.ic_gift,
-                        title = "Đổi BEAN",
-                        onClick = { /* TODO */ },
-                        iconColor = HighlandRed,
-                        modifier = Modifier.weight(1f)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "$beanCount Bean",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = HighlandWhite
                     )
                 }
                 
-                Spacer(modifier = Modifier.height(12.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.coffee_beans),
+                    contentDescription = null,
+                    modifier = Modifier.size(60.dp),
+                    colorFilter = ColorFilter.tint(HighlandWhite.copy(alpha = 0.3f))
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(20.dp))
+        
+        Text(
+            text = "Đổi Bean lấy ưu đãi",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = HighlandText,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+        
+        // Exchange items
+        ExchangeItem(
+            title = "Voucher Giảm 20%",
+            beanCost = 30,
+            imageRes = R.drawable.ic_voucher
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        ExchangeItem(
+            title = "Free 1 Cà Phê",
+            beanCost = 50,
+            imageRes = R.drawable.coffee_beans
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        ExchangeItem(
+            title = "Freeship Toàn Quốc",
+            beanCost = 25,
+            imageRes = R.drawable.shipping
+        )
+    }
+}
 
-                // Second row with two buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+@Composable
+fun HistoryTab(paddingValues: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Lịch sử Bean",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = HighlandText,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+        
+        HistoryItem(
+            title = "Tích Bean từ đơn hàng",
+            amount = "+15 Bean",
+            date = "15/11/2024",
+            isPositive = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        HistoryItem(
+            title = "Đổi voucher giảm 20%",
+            amount = "-30 Bean",
+            date = "14/11/2024",
+            isPositive = false
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        HistoryItem(
+            title = "Tích Bean từ đơn hàng",
+            amount = "+25 Bean",
+            date = "12/11/2024",
+            isPositive = true
+        )
+    }
+}
+
+// New modern components
+@Composable
+fun ModernVoucherCard(
+    discountText: String,
+    titleText: String,
+    expiryDate: String,
+    imageRes: Int,
+    hasFreeship: Boolean = false
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Image section
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                
+                // Overlay gradient
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.4f))
+                            )
+                        )
+                )
+                
+                // Discount badge
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(12.dp)
+                        .background(HighlandRed, RoundedCornerShape(20.dp))
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-                    FunctionButton(
-                        icon = R.drawable.ic_coffeeseed,
-                        title = "Lịch sử BEAN",
-                        onClick = { /* TODO */ },
-                        iconColor = HighlandRed,
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    FunctionButton(
-                        icon = R.drawable.ic_person,
-                        title = "Quyền lợi của bạn",
-                        onClick = { /* TODO */ },
-                        iconColor = HighlandRed,
-                        modifier = Modifier.weight(1f)
+                    Text(
+                        text = discountText,
+                        color = HighlandWhite,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
             
-            // Voucher section
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                // Header
+            // Content section
+            Column(modifier = Modifier.padding(16.dp)) {
+                if (hasFreeship) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0xFF4CAF50), RoundedCornerShape(4.dp))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "FREESHIP",
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                
+                Text(
+                    text = titleText,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = HighlandText,
+                    maxLines = 2
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Voucher của bạn",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = HighlandText
+                        text = expiryDate,
+                        fontSize = 12.sp,
+                        color = HighlandText.copy(alpha = 0.6f)
                     )
                     
-                    Text(
-                        text = "Xem tất cả",
-                        fontSize = 14.sp,
-                        color = HighlandRed,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.clickable { /* TODO */ }
-                    )
+                    Button(
+                        onClick = { /* Use voucher */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = HighlandRed),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text("Sử dụng", fontSize = 13.sp)
+                    }
                 }
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Vouchers
-                VoucherCard(
-                    discountText = "30%",
-                    titleText = "Giảm 30% toàn bộ Menu Nước Size Lớn",
-                    expiryDate = "Hết hạn 23/04/2024",
-                    color = HighlandRed,
-                    imageRes = R.drawable.vc_1
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                VoucherCard(
-                    discountText = "40%",
-                    titleText = "Giảm 40% + Freeship Đơn Từ 10 Ly Trở Lên",
-                    expiryDate = "Hết hạn 30/04/2024",
-                    color = HighlandRed,
-                    freeshipTag = true,
-                    imageRes = R.drawable.vc_2
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                VoucherCard(
-                    discountText = "30%",
-                    titleText = "Giảm 30% + Freeship Đơn Từ 3 Ly",
-                    expiryDate = "Hết hạn 30/04/2024",
-                    color = HighlandRed,
-                    freeshipTag = true,
-                    imageRes = R.drawable.vc_3
-                )
             }
         }
     }
 }
 
 @Composable
-fun FunctionButton(
-    icon: Int,
+fun ExchangeItem(
     title: String,
-    onClick: () -> Unit,
-    iconColor: Color = HighlandRed,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .clickable(onClick = onClick)
-    ) {
-        Box(
-            modifier = Modifier
-                .height(80.dp)
-                .fillMaxWidth()
-                .background(
-                    color = HighlandWhite,
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .border(
-                    width = 1.dp,
-                    color = HighlandRed.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(12.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(id = icon),
-                    contentDescription = title,
-                    modifier = Modifier.size(32.dp),
-                    colorFilter = ColorFilter.tint(iconColor)
-                )
-                
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = title,
-                    fontSize = 13.sp,
-                    color = HighlandText,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun VoucherCard(
-    discountText: String,
-    titleText: String,
-    expiryDate: String,
-    color: Color,
-    freeshipTag: Boolean = false,
+    beanCost: Int,
     imageRes: Int
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = HighlandWhite
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left side with image
-            Box(
-                modifier = Modifier
-                    .width(80.dp)
-                    .height(80.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(color.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = imageRes),
-                    contentDescription = "Voucher image",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Right side with text
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .background(HighlandRed.copy(alpha = 0.1f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    // Discount tag
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = color,
-                                shape = RoundedCornerShape(4.dp)
-                            )
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
+                    Image(
+                        painter = painterResource(id = imageRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                Column {
+                    Text(
+                        text = title,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = HighlandText
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.coffee_beans),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = discountText,
-                            color = HighlandWhite,
-                            fontSize = 14.sp,
+                            text = "$beanCost Bean",
+                            fontSize = 13.sp,
+                            color = HighlandRed,
                             fontWeight = FontWeight.Bold
                         )
                     }
-
-                    if (freeshipTag) {
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = Color(0xFF4CAF50),
-                                    shape = RoundedCornerShape(4.dp)
-                                )
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "FREESHIP",
-                                color = HighlandWhite,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
                 }
+            }
+            
+            Button(
+                onClick = { /* Exchange */ },
+                colors = ButtonDefaults.buttonColors(containerColor = HighlandRed),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text("Đổi", fontSize = 13.sp)
+            }
+        }
+    }
+}
 
-                Spacer(modifier = Modifier.height(8.dp))
-
+@Composable
+fun HistoryItem(
+    title: String,
+    amount: String,
+    date: String,
+    isPositive: Boolean
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = titleText,
+                    text = title,
                     fontSize = 14.sp,
-                    color = HighlandText,
                     fontWeight = FontWeight.Medium,
-                    maxLines = 2
+                    color = HighlandText
                 )
-                
                 Spacer(modifier = Modifier.height(4.dp))
-
                 Text(
-                    text = expiryDate,
+                    text = date,
                     fontSize = 12.sp,
                     color = HighlandText.copy(alpha = 0.6f)
                 )
             }
-
-            // Arrow icon
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = "View details",
-                tint = HighlandText.copy(alpha = 0.5f),
-                modifier = Modifier.size(24.dp)
+            
+            Text(
+                text = amount,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (isPositive) Color(0xFF4CAF50) else HighlandRed
             )
         }
     }

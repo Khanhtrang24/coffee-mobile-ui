@@ -352,7 +352,7 @@ fun DeliveryOption() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Nguyễn Đình Tuấn", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF553311))
+                Text("Nguyen Phan", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF553311))
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Lô T2-1,2, Đường D1, Quận 9, Hồ Chí Minh, Việt Nam",
