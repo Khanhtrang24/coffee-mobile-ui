@@ -98,8 +98,8 @@ class MainActivity : ComponentActivity() {
                                     onForgotPasswordClick = { currentScreen = Screen.ForgotPassword },
                                     onSignUpClick = { currentScreen = Screen.SignUp },
                                     onLoginClick = {
-                                        if (authManager.getSavedEmail() == "gm.giaphu@gmail.com") {
-                                            currentScreen = Screen.Admin
+                                        if (authManager.getSavedEmail() == "gm.nguyenphan@gmail.com") {
+                                            currentScreen = Screen.Main
                                         } else {
                                             currentScreen = Screen.Main
                                         }
@@ -141,11 +141,6 @@ class MainActivity : ComponentActivity() {
                                     emailAddress = emailForOtp,
                                     onBackClick = { currentScreen = Screen.SignUp },
                                     onVerifyOtp = {
-                                        currentScreen = Screen.Login
-                                    }
-                                )
-                                Screen.Admin -> AdminScreen(
-                                    onLogoutClick = {
                                         currentScreen = Screen.Login
                                     }
                                 )
@@ -309,7 +304,7 @@ class MainActivity : ComponentActivity() {
         Payment,
         Coupon,
         Booked,
-        Admin,
+        //Admin,
         UserInfo,
         History,
         WishList,
