@@ -116,7 +116,7 @@ fun ProductDetailDialog(
     
     val displayedCategoryText = remember(selectedCategoryId, categories) {
         val text = categories.firstOrNull { it.first == selectedCategoryId }?.second ?: "Chọn danh mục"
-        android.util.Log.d("ProductDetailDialog", "Displayed category text calculated: $text (selectedId: $selectedCategoryId, categories size: ${categories.size})")
+        android.util.Log.d("ProductDetailDialogdsadsad", "Displayed category text calculated: $text (selectedId: $selectedCategoryId, categories size: ${categories.size})")
         text
     }
 
